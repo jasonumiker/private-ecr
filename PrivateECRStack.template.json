@@ -41,6 +41,21 @@
                     }
                   },
                   "Effect": "Allow",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "Repository22E53BBD",
+                      "Arn"
+                    ]
+                  }
+                },
+                {
+                  "Action": "ecr:GetAuthorizationToken",
+                  "Condition": {
+                    "StringEquals": {
+                      "aws:SourceVpc": "vpc-04f7508b364f824e9"
+                    }
+                  },
+                  "Effect": "Allow",
                   "Resource": "*"
                 }
               ],

@@ -29,12 +29,22 @@ class PrivateECRStack(core.Stack):
                         "ecr:*",
                         "cloudtrail:LookupEvents"
                     ],
-                    "Resource": "*",
+                    "Resource": repo.repository_arn,
                     "Condition": {
                         "StringEquals": {
                             "aws:SourceVpc": vpc.vpc_id
                         }
                     }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": "ecr:GetAuthorizationToken",
+                  "Resource": "*",
+                  "Condition": {
+                    "StringEquals": {
+                      "aws:SourceVpc": "vpc-04f7508b364f824e9"
+                    }
+                  }
                 }
             ]
         }
