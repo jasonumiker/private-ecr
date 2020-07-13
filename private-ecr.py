@@ -42,7 +42,7 @@ class PrivateECRStack(core.Stack):
                   "Resource": "*",
                   "Condition": {
                     "StringEquals": {
-                      "aws:SourceVpc": "vpc-04f7508b364f824e9"
+                      "aws:SourceVpc": vpc.vpc_id
                     }
                   }
                 }
