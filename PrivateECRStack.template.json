@@ -1,0 +1,171 @@
+{
+  "Resources": {
+    "Repository22E53BBD": {
+      "Type": "AWS::ECR::Repository",
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Retain",
+      "Metadata": {
+        "aws:cdk:path": "PrivateECRStack/Repository/Resource"
+      }
+    },
+    "ECRAccessRoleF81F23FE": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "codebuild.amazonaws.com",
+                  "ec2.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ecr:*",
+                    "cloudtrail:LookupEvents"
+                  ],
+                  "Condition": {
+                    "StringEquals": {
+                      "aws:SourceVpc": "vpc-04f7508b364f824e9"
+                    }
+                  },
+                  "Effect": "Allow",
+                  "Resource": "*"
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "0"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "PrivateECRStack/ECRAccessRole/Resource"
+      }
+    },
+    "InstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Roles": [
+          {
+            "Ref": "ECRAccessRoleF81F23FE"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "PrivateECRStack/InstanceProfile"
+      }
+    },
+    "ECRSGFB18DFF8": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "PrivateECRStack/ECR-SG",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1"
+          }
+        ],
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "10.0.0.0/16",
+            "Description": "from 10.0.0.0/16:443",
+            "FromPort": 443,
+            "IpProtocol": "tcp",
+            "ToPort": 443
+          }
+        ],
+        "VpcId": "vpc-04f7508b364f824e9"
+      },
+      "Metadata": {
+        "aws:cdk:path": "PrivateECRStack/ECR-SG/Resource"
+      }
+    },
+    "ecrE6FB9DFC": {
+      "Type": "AWS::EC2::VPCEndpoint",
+      "Properties": {
+        "ServiceName": "com.amazonaws.ap-southeast-2.ecr.api",
+        "VpcId": "vpc-04f7508b364f824e9",
+        "PrivateDnsEnabled": true,
+        "SecurityGroupIds": [
+          {
+            "Fn::GetAtt": [
+              "ECRSGFB18DFF8",
+              "GroupId"
+            ]
+          }
+        ],
+        "SubnetIds": [
+          "subnet-08556122a452e0352",
+          "subnet-0cb4cb52c75dcdf35"
+        ],
+        "VpcEndpointType": "Interface"
+      },
+      "Metadata": {
+        "aws:cdk:path": "PrivateECRStack/ecr/Resource"
+      }
+    },
+    "ecrdkr30066869": {
+      "Type": "AWS::EC2::VPCEndpoint",
+      "Properties": {
+        "ServiceName": "com.amazonaws.ap-southeast-2.ecr.dkr",
+        "VpcId": "vpc-04f7508b364f824e9",
+        "PrivateDnsEnabled": true,
+        "SecurityGroupIds": [
+          {
+            "Fn::GetAtt": [
+              "ECRSGFB18DFF8",
+              "GroupId"
+            ]
+          }
+        ],
+        "SubnetIds": [
+          "subnet-08556122a452e0352",
+          "subnet-0cb4cb52c75dcdf35"
+        ],
+        "VpcEndpointType": "Interface"
+      },
+      "Metadata": {
+        "aws:cdk:path": "PrivateECRStack/ecrdkr/Resource"
+      }
+    },
+    "s3100BEDFB": {
+      "Type": "AWS::EC2::VPCEndpoint",
+      "Properties": {
+        "ServiceName": {
+          "Fn::Join": [
+            "",
+            [
+              "com.amazonaws.",
+              {
+                "Ref": "AWS::Region"
+              },
+              ".s3"
+            ]
+          ]
+        },
+        "VpcId": "vpc-04f7508b364f824e9",
+        "RouteTableIds": [
+          "rtb-0517d3f89579fca3f",
+          "rtb-0b8585d6c62e5b56e"
+        ],
+        "VpcEndpointType": "Gateway"
+      },
+      "Metadata": {
+        "aws:cdk:path": "PrivateECRStack/s3/Resource"
+      }
+    }
+  }
+}
